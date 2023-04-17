@@ -2,7 +2,7 @@ import React from 'react';
 import ImageUploader from "react-images-upload";
 import './App.css';
 import { Button } from '@mui/material';
-import { buildInputFile, execute, loadImageElement } from 'wasm-imagemagick';
+import { buildInputFile, execute } from 'wasm-imagemagick';
 
 function App() {
 
@@ -14,13 +14,11 @@ function App() {
     if (!picture)
       return;
     const inputFile = await buildInputFile(picture[1], 'input.jpg');
-    const { outputFiles, exitCode } = await execute({
+    const { outputFiles } = await execute({
       inputFiles: [inputFile],
       commands: 'convert input.jpg -compress none out.ppm',
     });
     const output = outputFiles[0];
-    // download the file
-    // const blob = new Blob([output.data], { type: 'image/ppm' });
     const blob = output.blob;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
