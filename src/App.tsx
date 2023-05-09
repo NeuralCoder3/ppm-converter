@@ -1,6 +1,7 @@
 import React from 'react';
 import ImageUploader from "react-images-upload";
 import './App.css';
+// import {useDropzone} from 'react-dropzone';
 import { Button, Input } from '@mui/material';
 import { buildInputFile, execute } from 'wasm-imagemagick';
 
@@ -23,13 +24,15 @@ function App() {
     if (!picture)
       return;
     const file_name = picture[0].name;
-    console.log(file_name);
     const inputFile = await buildInputFile(picture[1], file_name);
     const { outputFiles } = await execute({
       inputFiles: [inputFile],
       commands: command.replace("%image", file_name),
     });
     const output = outputFiles[0];
+    // set name to original file name + new extension
+    const new_ext = output.name.split(".").pop();
+    output.name = file_name.replace(/\.[^/.]+$/, "") + "." + new_ext;
     const blob = output.blob;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -38,8 +41,7 @@ function App() {
     a.click();
   };
 
-  return (
-    <div className="App">
+  const image_uploader = (
       <ImageUploader
         withIcon={false}
         withPreview={true}
@@ -49,7 +51,14 @@ function App() {
         maxFileSize={5242880}
         singleImage={true}
       />
+  );
 
+  // const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+
+
+  return (
+    <div className="App">
+      {image_uploader}
       <Button variant="contained" color="primary" onClick={convert} disabled={!picture}>
         Convert to PPM
       </Button>
